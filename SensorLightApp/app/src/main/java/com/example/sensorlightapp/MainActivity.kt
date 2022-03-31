@@ -25,11 +25,11 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        //ustawiamy aktywność na tryb nocny, zeby aplikacja była w trybie swiatał, mówiąc ze nie chcemy
-        // trybu nocnego
+
         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
 
         //bierzemy, i szukamy po id naszego textu który bedzie sie zmieniał oraz progress baru
+        //to co definiowane było w activity_main.xml
         text = findViewById(R.id.tv_text)
         pb = findViewById(R.id.circularProgressBar)
 
@@ -37,13 +37,13 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
 
     }
 
-    //tworzymy nowa funkcje do obsługi sensora oswietlenia
+    //tworzymy nowa funkcje do obsługi sensora oświetlenia
     private fun setUpSensorStuff() {
         sensorManager = getSystemService(SENSOR_SERVICE) as SensorManager
         brightness = sensorManager.getDefaultSensor(Sensor.TYPE_LIGHT)
     }
 
-    //funkcja obsługująca aplikacje co ona wyswietla i zwracam nam na ekaranie
+    //funkcja obsługująca aplikacje, co ona wyświetla i zwraca nam na ekranie telefonu
     private fun brightness(brightness: Float): String {
         return when (brightness.toInt()){
             0 -> "Pitch black"
@@ -55,7 +55,7 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
         }
     }
 
-    //funkcja do tego co sie zmienia i wyswietla na sensorze w kole na apce
+    //funkcja do tego co sie zmienia i wyświetla na sensorze w zaimplementowanym kole na apce
     override fun onSensorChanged(event: SensorEvent?) {
         if (event?.sensor?.type == Sensor.TYPE_LIGHT){
             val light = event.values[0]
@@ -69,13 +69,14 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
         return
     }
 
-    //nowa funkcja do obsługi z czytywania, rekacji sensora na zamine oswietlenia
+    //nowa funkcja do obsługi z czytywania, reakcji sensora na zmiane oświetlenia
     override fun onResume() {
         super.onResume()
         sensorManager.registerListener(this, brightness, SensorManager.SENSOR_DELAY_NORMAL)
     }
 
-    //funkcja do zamknieca palikacji, zatrzymania jej, zeby nie działała w tle bez powodu
+    //funkcja do zamkniecia aplikacji, do jej zapauzowania/zatrzymania jej, zeby nie działała w tle oraz
+    //nie wykorzystwała pamięcie, w momencie zapełnienia, będzie ona "zabita" zeby zwolnić pamieć
     override fun onPause() {
         super.onPause()
         sensorManager.unregisterListener(this)
