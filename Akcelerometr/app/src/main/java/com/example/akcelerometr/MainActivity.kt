@@ -47,8 +47,14 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
     }
 
     override fun onSensorChanged(event: SensorEvent?) {
+        var MULTIPLIER = 20
         if (event != null) {
-            ground!!.updateMe(event.values[1], event.values[0])
+            if (event.values[0] < 0.002*MULTIPLIER && event.values[0] > -0.002*MULTIPLIER ||
+                event.values[1] < 0.002*MULTIPLIER && event.values[1] > -0.002*MULTIPLIER) {
+            }
+            else {
+                ground!!.updateMe(event.values[0], event.values[1])
+            }
         }
     }
 
@@ -98,7 +104,6 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
                 }
             }
         }
-
     }
 }
 
@@ -168,7 +173,7 @@ class GroundView (context: Context?) : SurfaceView(context), SurfaceHolder.Callb
 
     fun updateMe(inx: Float, iny: Float) {
 
-        lastGx += inx
+        lastGx -= inx
         lastGy += iny
 
         cx += lastGx
@@ -212,5 +217,4 @@ class GroundView (context: Context?) : SurfaceView(context), SurfaceHolder.Callb
             invalidate()
         }
     }
-
 }
