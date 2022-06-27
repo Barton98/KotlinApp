@@ -11,7 +11,6 @@ import android.hardware.Sensor
 import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
 import android.hardware.SensorManager
-import android.os.Build
 import android.os.Bundle
 import android.os.Vibrator
 import android.view.*
@@ -33,21 +32,14 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
 
         window.setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN)
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
-            window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_LAYOUT_STABLE
-            View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
-            View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
-            View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
-            View.SYSTEM_UI_FLAG_FULLSCREEN
-            View.SYSTEM_UI_FLAG_IMMERSIVE
-        }
-
         ground = GroundView(this)
         setContentView(ground)
     }
 
     override fun onSensorChanged(event: SensorEvent?) {
+
         var MULTIPLIER = 20
+
         if (event != null) {
             if (event.values[0] < 0.002*MULTIPLIER && event.values[0] > -0.002*MULTIPLIER ||
                 event.values[1] < 0.002*MULTIPLIER && event.values[1] > -0.002*MULTIPLIER) {
@@ -88,18 +80,18 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
 
         override fun run() {
 
-            var c: Canvas? = null
+            var g: Canvas? = null //zmienna g utworzona do narysownia powierzchni dla piłki
 
             while (run) {
-                c = null
+                g = null
                 try {
-                    c = surfaceHolder!!.lockCanvas(null)
+                    g = surfaceHolder!!.lockCanvas(null)
                     synchronized(surfaceHolder!!) {
-                        panel!!.draw(c)
+                        panel!!.draw(g)
                     }
                 }finally {
-                    if (c != null) {
-                        surfaceHolder!!.unlockCanvasAndPost(c)
+                    if (g != null) {
+                        surfaceHolder!!.unlockCanvasAndPost(g)
                     }
                 }
             }
@@ -109,8 +101,8 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
 
 class GroundView (context: Context?) : SurfaceView(context), SurfaceHolder.Callback {
 
-    var cx : Float = 10.toFloat()
-    var cy : Float = 10.toFloat()
+    var gx : Float = 10.toFloat()
+    var gy : Float = 10.toFloat()
 
     var lastGx : Float = 0.toFloat()
     var lastGy : Float = 0.toFloat()
@@ -132,7 +124,6 @@ class GroundView (context: Context?) : SurfaceView(context), SurfaceHolder.Callb
     init {
         holder.addCallback(this)
         thread = MainActivity.DrawThread(holder, this)
-
         val display: Display = (getContext().getSystemService(Context.WINDOW_SERVICE) as WindowManager).defaultDisplay
         val size: Point = Point()
         display.getSize(size)
@@ -159,15 +150,7 @@ class GroundView (context: Context?) : SurfaceView(context), SurfaceHolder.Callb
         super.draw(canvas)
         if (canvas != null) {
             canvas.drawColor(0xFFAAAAA)
-            canvas.drawBitmap(icon!!, cx, cy, null)
-        }
-    }
-
-    override public fun onDraw(canvas: Canvas?) {
-        super.onDraw(canvas)
-        if (canvas != null) {
-            canvas.drawColor(0xFFAAAAA)
-            canvas.drawBitmap(icon!!, cx, cy, null)
+            canvas.drawBitmap(icon!!, gx, gy, null)
         }
     }
 
@@ -176,18 +159,18 @@ class GroundView (context: Context?) : SurfaceView(context), SurfaceHolder.Callb
         lastGx -= inx
         lastGy += iny
 
-        cx += lastGx
-        cy += lastGy
+        gx += lastGx
+        gy += lastGy
 
-        if (cx > (Windowwidth - picWidth)) {
-            cx = (Windowwidth - picWidth).toFloat()
+        if (gx > (Windowwidth - picWidth)) {
+            gx = (Windowwidth - picWidth).toFloat()
             lastGx = 0F
             if (noBorderX) {
                 vibrationService!!.vibrate(500)
                 noBorderX = false
             }
-        }else if (cx < (0)) {
-            cx = 0F
+        }else if (gx < (0)) {
+            gx = 0F
             lastGx = 0F
             if (noBorderX) {
                 vibrationService!!.vibrate(500)
@@ -197,15 +180,15 @@ class GroundView (context: Context?) : SurfaceView(context), SurfaceHolder.Callb
             noBorderX = true
         }
 
-        if (cy > (Windowheight - picHeight)) {
-            cy = (Windowheight - picHeight).toFloat()
+        if (gy > (Windowheight - picHeight)) {
+            gy = (Windowheight - picHeight).toFloat()
             lastGy = 0F
             if (noBorderY) {
                 vibrationService!!.vibrate(100)
                 noBorderY = false
             }
-        }else if (cy < (0)) {
-            cy = 0F
+        }else if (gy < (0)) {
+            gy = 0F
             lastGy = 0F
             if (noBorderY) {
                 vibrationService!!.vibrate(100)

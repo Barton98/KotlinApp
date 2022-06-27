@@ -38,12 +38,12 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
 
     private fun brightness(brightness: Float): String {
         return when (brightness.toInt()){
-            0 -> "Czarna dziura"
+            0 -> "Smolista czerń"
             in 1..10 -> "Ciemność"
             in 11..50 -> "Jasno"
-            in 51..5000 -> "Normalnie"
+            in 51..5000 -> "Słonecznie"
             in 5001..25000 -> "Niesamowicie jasno"
-            else -> "To światło cie oślepi!!!"
+            else -> "To światło może oślepić!!!"
         }
     }
 
